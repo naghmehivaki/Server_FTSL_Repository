@@ -1,4 +1,4 @@
-package ftsl.FTTCP;
+package ftsl;
 
 public class MessageInfo {
 	
