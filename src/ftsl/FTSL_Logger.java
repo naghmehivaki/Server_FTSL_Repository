@@ -35,79 +35,7 @@ public class FTSL_Logger extends Thread {
 	FileOutputStream sentMessagesInfoOut = null;
 	FileOutputStream receivedBufferOut = null;
 
-	public class Lock {
-
-		private boolean isLocked = false;
-
-		public synchronized void lock() throws InterruptedException {
-			while (isLocked) {
-				wait();
-			}
-			isLocked = true;
-		}
-
-		public synchronized void unlock() {
-			isLocked = false;
-			notify();
-		}
-	}
-
-	public void init() {
-		sessionF = new File(session);
-
-		try {
-			if (!sessionF.exists())
-				sessionF.createNewFile();
-			sessionsOut = new FileOutputStream(sessionF);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		sentBufferF = new File(sentBuffer);
-
-		try {
-			if (!sentBufferF.exists())
-				sentBufferF.createNewFile();
-			sentBufferOut = new FileOutputStream(sentBufferF);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		sentMessagesInfoF = new File(sentMessagesInfo);
-
-		try {
-			if (!sentMessagesInfoF.exists())
-				sentMessagesInfoF.createNewFile();
-			sentMessagesInfoOut = new FileOutputStream(sentMessagesInfoF);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		receivedBufferF = new File(receivedBuffer);
-		try {
-			if (!receivedBufferF.exists())
-				receivedBufferF.createNewFile();
-			receivedBufferOut = new FileOutputStream(receivedBufferF);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
+	/* ****************************** Constructors */
 
 	public FTSL_Logger() {
 
@@ -120,168 +48,62 @@ public class FTSL_Logger extends Thread {
 		sentBuffer = sentBuffer + "_" + sessionID;
 		sentMessagesInfo = sentMessagesInfo + "_" + sessionID;
 		receivedBuffer = receivedBuffer + "_" + sessionID;
-
 		init();
-
 	}
-	
-	
 
-	public void logSessionInfo(String key, String value) {
-
-		String log = key + ": " + value + "\n";
-
+	public void init() {
+		sessionF = new File(session);
 		try {
-			lock.lock();
-			sessionsOut.write(log.getBytes());
-			lock.unlock();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			if (!sessionF.exists())
+				sessionF.createNewFile();
+			sessionsOut = new FileOutputStream(sessionF);
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-	}
+		sentBufferF = new File(sentBuffer);
 
-	public void logSessionInfo(String key, Socket socket) {
-		String log = key + ": " + socket.getInetAddress() + " "
-				+ socket.getPort() + "\n";
 		try {
-			lock.lock();
-			sessionsOut.write(log.getBytes());
-			lock.unlock();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			if (!sentBufferF.exists())
+				sentBufferF.createNewFile();
+			sentBufferOut = new FileOutputStream(sentBufferF);
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-	}
-
-	public void logSessionInfo(String key, int value) {
-
-		String log = key + ": " + value + "\n";
+		sentMessagesInfoF = new File(sentMessagesInfo);
 
 		try {
-			lock.lock();
-			sessionsOut.write(log.getBytes());
-			lock.unlock();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			if (!sentMessagesInfoF.exists())
+				sentMessagesInfoF.createNewFile();
+			sentMessagesInfoOut = new FileOutputStream(sentMessagesInfoF);
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-	}
-
-	public void logSession(Session session) {
-
-		String log = "SessionID: " + session.getSessionID() + "\n";
-		log = log + "Socket: " + session.getSocket().getInetAddress() + " "
-				+ session.getSocket().getPort() + "\n";
-		log = log + "lastSentPacketID: " + session.getLastSentPacketID() + "\n";
-		log = log + "lastRecievedPacketID: "
-				+ session.getLastRecievedPacketID() + "\n";
-		log = log + "sendMessageID: " + session.getSendMessageID() + "\n";
-		log = log + "recieveMessageID: " + session.getRecieveMessageID() + "\n";
-
+		receivedBufferF = new File(receivedBuffer);
 		try {
-			lock.lock();
-			sessionsOut.write(log.getBytes());
-			lock.unlock();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			if (!receivedBufferF.exists())
+				receivedBufferF.createNewFile();
+			receivedBufferOut = new FileOutputStream(receivedBufferF);
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 
-	public void logMessageInfo(MessageInfo info) {
-		String log = info.getStart() + " " + info.getIndex() + " "
-				+ info.getEnd() + " " + info.getId() + "\n";
-
-		try {
-			lock.lock();
-			sentMessagesInfoOut.write(log.getBytes());
-			lock.unlock();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
-	public void logSentMessage(String message) {
-		String log = message + "\n";
-
-		try {
-			lock.lock();
-			sentBufferOut.write(log.getBytes());
-			lock.unlock();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
-	public void logSentMessage(FTSLMessage message) {
-		String log = message.toString_() + "\n" + "#####\n";
-
-		try {
-			lock.lock();
-			sentBufferOut.write(log.getBytes());
-			lock.unlock();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
-	public void logReceivedMessage(int id, String message) {
-		String log = String.valueOf(id) + ": " + message + "\n";
-
-		try {
-			lock.lock();
-			receivedBufferOut.write(log.getBytes());
-			lock.unlock();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-
-		}
-
-	}
-
+	/* ********************************* */
 	public void log(Session session) {
 
 		try {
 			lock.lock();
 		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
@@ -292,14 +114,12 @@ public class FTSL_Logger extends Thread {
 				ftslF.createNewFile();
 			ftslOut = new FileOutputStream(ftslF);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		// ////////////////////////////////////////////// start log the session
+		// ///////////// start log the session
 
 		String log = "";
 
@@ -316,9 +136,6 @@ public class FTSL_Logger extends Thread {
 			log = log + "recieveMessageID: " + session.getRecieveMessageID()
 					+ "\n";
 
-			// MessageInfo info=session.getLastReceivedMessageInfo();
-			// log=log+"LastReceivedMessageInfo: "+
-			// info.getStart()+" "+info.getIndex()+" "+info.getEnd()+" "+info.getId()+"\n";
 			log = log + "SentMessagesInfo\n";
 			int index = 0;
 			Vector<MessageInfo> SentMessagesInfo = session
@@ -354,10 +171,10 @@ public class FTSL_Logger extends Thread {
 			ftslOut.write(log.getBytes());
 
 		} catch (Exception e) {
-			// TODO: handle exception
+			e.printStackTrace();
 		}
 
-		// ////////////////////////////////////////////// end log the session
+		// ///////////////////////// end log the session
 
 		try {
 			sessionsOut.close();
@@ -366,7 +183,6 @@ public class FTSL_Logger extends Thread {
 			receivedBufferOut.close();
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -380,11 +196,145 @@ public class FTSL_Logger extends Thread {
 
 	}
 
-	// ////////////////////////////////////////////////////////////////////////////////
+	public void logSessionInfo(String key, String value) {
+
+		String log = key + ": " + value + "\n";
+
+		try {
+			lock.lock();
+			sessionsOut.write(log.getBytes());
+			lock.unlock();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void logSessionInfo(String key, Socket socket) {
+		String log = key + ": " + socket.getInetAddress() + " "
+				+ socket.getPort() + "\n";
+		try {
+			lock.lock();
+			sessionsOut.write(log.getBytes());
+			lock.unlock();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void logSessionInfo(String key, int value) {
+
+		String log = key + ": " + value + "\n";
+
+		try {
+			lock.lock();
+			sessionsOut.write(log.getBytes());
+			lock.unlock();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void logSession(Session session) {
+
+		String log = "SessionID: " + session.getSessionID() + "\n";
+		log = log + "Socket: " + session.getSocket().getInetAddress() + " "
+				+ session.getSocket().getPort() + "\n";
+		log = log + "lastSentPacketID: " + session.getLastSentPacketID() + "\n";
+		log = log + "lastRecievedPacketID: "
+				+ session.getLastRecievedPacketID() + "\n";
+		log = log + "sendMessageID: " + session.getSendMessageID() + "\n";
+		log = log + "recieveMessageID: " + session.getRecieveMessageID() + "\n";
+
+		try {
+			lock.lock();
+			sessionsOut.write(log.getBytes());
+			lock.unlock();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void logMessageInfo(MessageInfo info) {
+		String log = info.getStart() + " " + info.getIndex() + " "
+				+ info.getEnd() + " " + info.getId() + "\n";
+
+		try {
+			lock.lock();
+			sentMessagesInfoOut.write(log.getBytes());
+			lock.unlock();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void logSentMessage(String message) {
+		String log = message + "\n";
+
+		try {
+			lock.lock();
+			sentBufferOut.write(log.getBytes());
+			lock.unlock();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void logSentMessage(FTSLMessage message) {
+		String log = message.toString_() + "\n" + "#####\n";
+
+		try {
+			lock.lock();
+			sentBufferOut.write(log.getBytes());
+			lock.unlock();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void logReceivedMessage(int id, String message) {
+		String log = String.valueOf(id) + ": " + message + "\n";
+
+		try {
+			lock.lock();
+			receivedBufferOut.write(log.getBytes());
+			lock.unlock();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} finally {
+
+		}
+
+	}
+
+	/* ***************************** */
 
 	public Session initSession(String sessionID) {
-		
-		System.out.println("it is initilizing the session :) :):) :):) :):) :):) :):) :):) :):) :):) :):) :)");
+
+		System.out
+				.println("it is initilizing the session :) :):) :):) :):) :):) :):) :):) :):) :):) :):) :)");
 		Session session = new Session();
 
 		BufferedReader reader = null;
@@ -392,7 +342,7 @@ public class FTSL_Logger extends Thread {
 		// reading the ftsl file
 
 		try {
-			String log="";
+			String log = "";
 			reader = new BufferedReader(new FileReader(ftsl + "_" + sessionID));
 			System.out.println("read the ftsl");
 
@@ -428,11 +378,11 @@ public class FTSL_Logger extends Thread {
 					Vector<MessageInfo> sentMessagesInfo = new Vector<MessageInfo>();
 					log = reader.readLine();
 
-					while (log.compareTo("sentBuffer")!=0) {
+					while (log.compareTo("sentBuffer") != 0) {
 						MessageInfo info = new MessageInfo();
 
 						int index = log.indexOf(" ");
-						System.out.println(log+" "+ index);
+						System.out.println(log + " " + index);
 						info.setStart(Integer.valueOf(log.substring(0, index)));
 						log = log.substring(index + 1);
 						index = log.indexOf(" ");
@@ -453,9 +403,9 @@ public class FTSL_Logger extends Thread {
 				Vector<FTSLMessage> sentBuffer = session.getSentBuffer();
 
 				String str = "";
-				while (log.compareTo("receivedBuffer")!=0) {
+				while (log.compareTo("receivedBuffer") != 0) {
 
-					if (log.compareTo("#####")!=0) {
+					if (log.compareTo("#####") != 0) {
 						str = str + log + "\n";
 					} else {
 						FTSLMessage packet = FTSLMessage.valueOf_(str);
@@ -475,7 +425,7 @@ public class FTSL_Logger extends Thread {
 				while (log != null) {
 
 					int id = 0;
-					if (log.compareTo("#####")!=0) {
+					if (log.compareTo("#####") != 0) {
 						if (str == "") {
 							int index = log.indexOf(":");
 							id = Integer.valueOf(log.substring(0, index));
@@ -496,7 +446,6 @@ public class FTSL_Logger extends Thread {
 			e.printStackTrace();
 		}
 
-		// /////////////////////////////////////////////////////////////
 		// reading session
 
 		reader = null;
@@ -562,8 +511,8 @@ public class FTSL_Logger extends Thread {
 				String str = "";
 				while (log != null) {
 
-					if (log.compareTo("#####")!=0) {
-						//str = str + log + "\n";
+					if (log.compareTo("#####") != 0) {
+						// str = str + log + "\n";
 					} else {
 						FTSLMessage packet = FTSLMessage.valueOf_(str);
 						session.addSentMessage(packet);
@@ -626,8 +575,8 @@ public class FTSL_Logger extends Thread {
 				while (log != null) {
 
 					int id = 0;
-					if (log.compareTo("#####")!=0) {
-						if (str.compareTo("")!=0) {
+					if (log.compareTo("#####") != 0) {
+						if (str.compareTo("") != 0) {
 							int index = log.indexOf(":");
 							id = Integer.valueOf(log.substring(0, index));
 							log = log.substring(index + 2);
@@ -643,9 +592,28 @@ public class FTSL_Logger extends Thread {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		System.out.println("initialization is finished :))))))))))))))))))))))))))))");
+
+		System.out
+				.println("initialization is finished :))))))))))))))))))))))))))))");
 
 		return session;
+	}
+
+	/* ***************************** */
+	public class Lock {
+
+		private boolean isLocked = false;
+
+		public synchronized void lock() throws InterruptedException {
+			while (isLocked) {
+				wait();
+			}
+			isLocked = true;
+		}
+
+		public synchronized void unlock() {
+			isLocked = false;
+			notify();
+		}
 	}
 }

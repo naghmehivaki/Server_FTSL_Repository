@@ -5,42 +5,25 @@ import java.io.Serializable;
 
 public class FTSLHeader implements Serializable {
 
-	/**
-	 * 
-	 */
 	static String protocol="FTSL-1.0";
 	
 	String SID;
-	/* flag identifies if a message is request or reply if flag is "req"
-	 *  then it is a request and if flag is "rep" it is a reply
-	 */
 	
-	/* 1- if FLAG="REQUEST" then the message is a http request 
-	 * 2- if FLAG="REPLY" then the message is a http reply for the last received 
-	 * 3- if Flag="FTSL_NOTIFICATION" then the message is for informing about the new session is replaced with the old 
-	 * 4- if Flag="FTS_ACK" then the message is the ACK for informing about the session replacement 
-	 * 5- if Flag="FTSL_REQUEST" then the message is a FTSL request
-	 * 6- if Flag="FTSL_REPLY" then the message is a FTSL reply
-	 * 7- if Flag="FTSL_NACK" then it means that a reply is received but there are some
-	 *  messages waiting for their reply. server should send the replies again*/
+	/* 1- if Flag="FTSL_NOTIFICATION" then the message is for informing about the new session is replaced with the old 
+	 * 2- if Flag="FTS_ACK" then the message is the ACK for informing about the session replacement 
+	 * 3- if Flag="FTSL_REQUEST" then the message is a FTSL request
+	 * 4- if Flag="FTSL_REPLY" then the message is a FTSL reply
+	 * 5- if Flag="FTSL_NACK" then it means that a reply is received but there are some messages waiting for their reply. server should send the replies again*/
 	
 	String FLAG = "";
-	
 	int PID = 1;
-	
-	// ready reply in the server side and received reply in the client side
 	int rPID = 0;
-
-
-
-	// this the id of the Http request and reply. it helps to control the requests and replys
 	int MID=0;
-	
 	int MessageSize=0;
 	
-	
-	
 
+	/* *************************** Constructors*/
+	
 	public FTSLHeader(String sid, String flag, int pid, int rpid, int mid, int size) {
 		this.SID = sid;
 		this.FLAG=flag;

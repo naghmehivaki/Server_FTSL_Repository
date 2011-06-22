@@ -21,10 +21,8 @@ public class ServerSession {
 			//Logger.log("Server Session created the new ServerSocket "+serverSocket.toString());
 
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -40,7 +38,6 @@ public class ServerSession {
 			//Logger.log("Server session created a new session with the client");
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return session;
