@@ -339,7 +339,7 @@ public class Session extends Thread {
 
 		FTSLHeader header = new FTSLHeader(sessionID,
 				"APP", lastSentPacketID,
-				sendMessageID, lastRecievedPacketID, packet.length);
+				 lastRecievedPacketID, packet.length);
 
 		// Logger.log("the header of the packet is: " + header.toString_());
 		FTSLMessage pkt = new FTSLMessage(packet, header);
@@ -460,7 +460,6 @@ public class Session extends Thread {
 		if (index == -1) {
 			try {
 				int k = inputStream.read(buffer, read, 1024);
-
 				packet = new String(buffer);
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -495,14 +494,11 @@ public class Session extends Thread {
 		String flag = header.getFLAG();
 		String sid = header.getSID();
 		int pid = header.getPID();
-		int mid = header.getMID();
 		int rpid = header.getrPID();
 
-		if (flag.compareTo("") == 0) {
+		if (flag.compareTo("APP") == 0) {
 
-			// if (LastRecievedPacketID - lastSentPacketID >= MAX_BUFFER_SIZE) {
-			// sendFTSLReply();
-			// }
+			
 
 			int expectedPID = lastRecievedPacketID + 1;
 
@@ -517,15 +513,13 @@ public class Session extends Thread {
 				logger.logReceivedMessage(pid, new String(b));
 
 				if (!receivedBuffer.containsKey(pid - 1)) {
-					FTSLHeader h = new FTSLHeader(sid, "FTSL_NACK", pid,
+					FTSLHeader h = new FTSLHeader(sid, "NAK", pid,
 							lastRecievedPacketID, 0);
 					FTSLMessage ftslPacket = new FTSLMessage(null, h);
 
 					try {
-
 						outputStream.write(ftslPacket.toByte_());
 						outputStream.flush();
-
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -534,11 +528,11 @@ public class Session extends Thread {
 
 			}
 
-		} else if (flag.compareTo("FTSL_REQUEST") == 0) {
+		} else if (flag.compareTo("REQ") == 0) {
 	
 			// Logger.log("Server recieved a FTSL REQUEST " +
 			// LastRecievedPacketID);
-			FTSLHeader h = new FTSLHeader(sid, "FTSL_REPLY", 0,
+			FTSLHeader h = new FTSLHeader(sid, "REP", 0,
 					lastRecievedPacketID, 0);
 
 			FTSLMessage ftslPacket = new FTSLMessage(null, h);
@@ -553,13 +547,13 @@ public class Session extends Thread {
 			}
 			return -1;
 
-		} else if (flag.compareTo("FTSL_REPLY") == 0) {
+		} else if (flag.compareTo("REP") == 0) {
 			removeDeliveredMessages(rpid);
 			return -1;
 
-		} else if (flag == "FTSL_NOTIFICATION") {
+		} else if (flag == "NTF") {
 
-			FTSLHeader h = new FTSLHeader(sid, "FTSL_ACK", pid,
+			FTSLHeader h = new FTSLHeader(sid, "ACK", pid,
 					lastRecievedPacketID, 0);
 			FTSLMessage ftslPacket = new FTSLMessage(null, h);
 
@@ -572,7 +566,7 @@ public class Session extends Thread {
 				e.printStackTrace();
 			}
 			
-		} else if (flag.compareTo("FTSL_ACK") == 0) {
+		} else if (flag.compareTo("ACK") == 0) {
 
 			removeDeliveredMessages(rpid);
 			int index = 0;
@@ -595,7 +589,7 @@ public class Session extends Thread {
 			// ServerFTSL.updateSession(sessionID, this);
 			return -1;
 
-		} else if (flag.compareTo("FTSL_NACK") == 0) {
+		} else if (flag.compareTo("NAK") == 0) {
 			removeDeliveredMessages(rpid);
 			// all messages are lost should be sent again
 			int index = 0;

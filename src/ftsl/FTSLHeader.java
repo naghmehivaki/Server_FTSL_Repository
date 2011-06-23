@@ -18,35 +18,31 @@ public class FTSLHeader implements Serializable {
 	String FLAG = "";
 	int PID = 1;
 	int rPID = 0;
-	int MID=0;
 	int MessageSize=0;
 	
 
 	/* *************************** Constructors*/
 	
-	public FTSLHeader(String sid, String flag, int pid, int rpid, int mid, int size) {
+	public FTSLHeader(String sid, String flag, int pid, int rpid, int size) {
 		this.SID = sid;
 		this.FLAG=flag;
 		this.PID = pid;
 		this.rPID = rpid;
-		this.MID = mid;
 		this.MessageSize=size;
 
 	}
-	public FTSLHeader(String sid, String flag, int pid, int rpid, int mid) {
+	public FTSLHeader(String sid, String flag, int pid, int rpid) {
 		this.SID = sid;
 		this.FLAG=flag;
 		this.PID = pid;
 		this.rPID = rpid;
-		this.MID = mid;
 		this.MessageSize=0;
 	}
-	public FTSLHeader(String sid, String flag, int rpid, int mid) {
+	public FTSLHeader(String sid, String flag, int rpid) {
 		this.SID = sid;
 		this.FLAG=flag;
 		this.PID = 0;
 		this.rPID = rpid;
-		this.MID = mid;
 		this.MessageSize=0;
 	}
 
@@ -56,15 +52,6 @@ public class FTSLHeader implements Serializable {
 
 	public void setProtocol(String protocol) {
 		this.protocol = protocol;
-	}
-
-
-	public int getMID() {
-		return MID;
-	}
-
-	public void setMID(int rID) {
-		MID = rID;
 	}
 
 	public String getFLAG() {
@@ -120,10 +107,9 @@ public class FTSLHeader implements Serializable {
 		String sid = this.SID;
 		String pid = String.valueOf(this.PID);
 		String rpid = String.valueOf(this.rPID);
-		String mid = String.valueOf(this.MID);
 		String size = String.valueOf(this.MessageSize);
 
-		String header = protocol+" "+sid + " " +this.FLAG+" "+ pid + " " + rpid+ " " + mid + " " + size;
+		String header = protocol+" "+sid + " " +this.FLAG+" "+ pid + " " + rpid+ " " + size;
 		return header;
 	}
 
@@ -150,9 +136,6 @@ public class FTSLHeader implements Serializable {
 		str=str.substring(index + 1);
 		index = str.indexOf(" ");
 		header.setrPID(Integer.valueOf(str.substring(0, index)));
-		str=str.substring(index + 1);
-		index = str.indexOf(" ");
-		header.setMID(Integer.valueOf(str.substring(0, index)));
 		header.setMessageSize(Integer.valueOf(str.substring(index + 1)));
 		return header;
 	}
