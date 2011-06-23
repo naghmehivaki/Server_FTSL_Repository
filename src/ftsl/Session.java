@@ -83,6 +83,7 @@ public class Session extends Thread {
 			outputStream = new ObjectOutputStream(socket.getOutputStream());
 			outputStream.flush();
 			inputStream = new ObjectInputStream(socket.getInputStream());
+			
 			String sid=read();
 			
 			if (sid != "") {
@@ -104,7 +105,7 @@ public class Session extends Thread {
 
 	}
 
-	// ////////////////////////////////////////// setters and getters
+	/////////////////////// setters and getters
 
 	public Socket getSocket() {
 		return socket;
@@ -346,9 +347,7 @@ public class Session extends Thread {
 
 		try {
 			outputStream.write(buffer);
-			outputStream.flush();
-
-			// Logger.log("Server session wrote:\n" + new String(buffer));
+			//outputStream.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -359,15 +358,8 @@ public class Session extends Thread {
 		// Logger.log("FTSL is writing in the output stream in the server side of the proxy.");
 		increaseLastSentPacketID();
 
-//		if (appInterface.isNewOutgoingMessage(packet)) {
-//			increaseSendMessageID();
-//			addMessageInfo();
-//		} else {
-//			updateMessageInfo(lastSentPacketID);
-//		}
-
 		FTSLHeader header = new FTSLHeader(sessionID,
-				"", lastSentPacketID,
+				"APP", lastSentPacketID,
 				recieveMessageID, sendMessageID, packet.length);
 
 		// Logger.log("the header of the packet is: " + header.toString_());
@@ -378,9 +370,14 @@ public class Session extends Thread {
 		return buffer;
 	}
 		
-	public void flush(){
-		sendMessageID++;
+	public void flush() {  // the end of a stream of the message
+		try {
+			outputStream.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		addMessageInfo();
+		sendMessageID++;
 	}
 
 	
