@@ -9,11 +9,12 @@ public class FTSLHeader implements Serializable {
 	
 	String SID;
 	
-	/* 1- if Flag="FTSL_NOTIFICATION" then the message is for informing about the new session is replaced with the old 
-	 * 2- if Flag="FTS_ACK" then the message is the ACK for informing about the session replacement 
-	 * 3- if Flag="FTSL_REQUEST" then the message is a FTSL request
-	 * 4- if Flag="FTSL_REPLY" then the message is a FTSL reply
-	 * 5- if Flag="FTSL_NACK" then it means that a reply is received but there are some messages waiting for their reply. server should send the replies again*/
+	/* 0- id flag="APP" then the message is from the application layer
+	 * 1- if Flag="NTF" then the message is for informing about the new session is replaced with the old 
+	 * 2- if Flag="ACK" then the message is the ACK for informing about the session replacement 
+	 * 3- if Flag="REQ" then the message is a FTSL request
+	 * 4- if Flag="REP" then the message is a FTSL reply
+	 * 5- if Flag="NAK" then it means that a reply is received but there are some messages waiting for their reply. server should send the replies again*/
 	
 	String FLAG = "";
 	int PID = 1;

@@ -384,7 +384,7 @@ public class Session extends Thread {
 		// String(packet));
 		FTSLMessage message = FTSLMessage.valueOf_(packet);
 		String flag= message.getHeader().getFLAG();
-		if (flag.compareTo("FTSL_NOTIFICATION")==0) {
+		if (flag.compareTo("NTF")==0) {
 			
 			System.out.println(System.currentTimeMillis());
 			logger = new FTSL_Logger();
