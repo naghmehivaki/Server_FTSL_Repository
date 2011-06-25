@@ -133,8 +133,7 @@ public class FTSL_Logger extends Thread {
 			log = log + "lastRecievedPacketID: "
 					+ session.getLastRecievedPacketID() + "\n";
 			log = log + "sendMessageID: " + session.getSendMessageID() + "\n";
-			log = log + "recieveMessageID: " + session.getRecieveMessageID()
-					+ "\n";
+		//	log = log + "recieveMessageID: " + session.getRecieveMessageID()+ "\n";
 
 			log = log + "SentMessagesInfo\n";
 			int index = 0;
@@ -252,7 +251,7 @@ public class FTSL_Logger extends Thread {
 		log = log + "lastRecievedPacketID: "
 				+ session.getLastRecievedPacketID() + "\n";
 		log = log + "sendMessageID: " + session.getSendMessageID() + "\n";
-		log = log + "recieveMessageID: " + session.getRecieveMessageID() + "\n";
+	//	log = log + "recieveMessageID: " + session.getRecieveMessageID() + "\n";
 
 		try {
 			lock.lock();
@@ -369,9 +368,9 @@ public class FTSL_Logger extends Thread {
 				log = reader.readLine();
 				log = log.substring(log.indexOf(" ") + 1);
 				session.setSendMessageID(Integer.valueOf(log));
-				log = reader.readLine();
-				log = log.substring(log.indexOf(" ") + 1);
-				session.setRecieveMessageID(Integer.valueOf(log));
+//				log = reader.readLine();
+//				log = log.substring(log.indexOf(" ") + 1);
+//				session.setRecieveMessageID(Integer.valueOf(log));
 
 				log = reader.readLine();
 				if (log.compareTo("SentMessagesInfo") == 0) {
@@ -461,7 +460,7 @@ public class FTSL_Logger extends Thread {
 				int lastSentPacketID = session.getLastSentPacketID();
 				int lastRecievedPacketID = session.getLastRecievedPacketID();
 				int sendMessageID = session.getSendMessageID();
-				int recieveMessageID = session.getRecieveMessageID();
+				//int recieveMessageID = session.getRecieveMessageID();
 				while (log != null) {
 
 					int index = 0;
@@ -477,17 +476,18 @@ public class FTSL_Logger extends Thread {
 						index = log.indexOf(":");
 						sendMessageID = Integer.valueOf(log
 								.substring(index + 2));
-					} else if (log.contains("recieveMessageID")) {
-						index = log.indexOf(":");
-						recieveMessageID = Integer.valueOf(log
-								.substring(index + 2));
-
-					}
+					} 
+//						else if (log.contains("recieveMessageID")) {
+//						index = log.indexOf(":");
+//						recieveMessageID = Integer.valueOf(log
+//								.substring(index + 2));
+//
+//					}
 				}
 				session.setLastSentPacketID(lastSentPacketID);
 				session.setLastRecievedPacketID(lastRecievedPacketID);
 				session.setLastRecievedPacketID(sendMessageID);
-				session.setRecieveMessageID(recieveMessageID);
+			//	session.setRecieveMessageID(recieveMessageID);
 			}
 			System.out.println("initializing )))))))))))))))))))))))))))3");
 
