@@ -36,7 +36,7 @@ public class Session extends Thread {
 	HashMap<Integer, String> receivedBuffer = new HashMap<Integer, String>();
 	
 	/////////////////////////////// Messages Info
-	int sendMessageID = 0;
+	int sendMessageID = 1;
 	Vector<MessageInfo> SentMessagesInfo = new Vector<MessageInfo>();
 	
 	/* ***************************** Constructor*/
@@ -214,10 +214,9 @@ public class Session extends Thread {
 		return lastSentPacketID;
 	}
 
-	public int increaseSendMessageID() {
+	public void increaseSendMessageID() {
 		sendMessageID++;
 		logger.logSessionInfo("SendMessageID", sendMessageID);
-		return sendMessageID;
 	}
 	public void increaseLastRecievedPacketID() {
 		lastRecievedPacketID++;
@@ -290,6 +289,8 @@ public class Session extends Thread {
 		info.setIndex(lastSentPacketID);
 		info.setId(sendMessageID);
 		SentMessagesInfo.add(info);
+		logger.logMessageInfo(info);
+
 	}
 
 	public void addMessageInfo(MessageInfo info) {
@@ -334,7 +335,9 @@ public class Session extends Thread {
 		buffer = processOutputPacket(buffer);
 		try {
 			outputStream.write(buffer);
+			outputStream.flush();
 		} catch (IOException e) {
+			e.printStackTrace();
 			stop = true;
 		}
 	}
@@ -354,14 +357,8 @@ public class Session extends Thread {
 		
 	public void flush() { // the end of a stream of the message
 		addMessageInfo();
-		sendMessageID++;
-		try {
-			outputStream.flush();
-		} catch (IOException e) {
-			stop=true;
-		}
+		increaseSendMessageID();
 	}
-
 	
 	///////////////////////////////////////
 	public String read() {
@@ -429,18 +426,24 @@ public class Session extends Thread {
 				try {
 					read = inputStream.read(packet);
 				} catch (IOException e) {
+					e.printStackTrace();
 					read=0;
 				}
 			}
 
+			System.out.println(new String (packet));
 			int test = 1;
 			while (read != -1 & test == 1) {
 				int pSize = processInputPacket(packet);
+				System.out.println(new String (packet));
 
 				if (pSize == 0) {
 					try {
+						System.out.println(new String (packet));
+
 						read = inputStream.read(packet);
 					} catch (IOException e) {
+						e.printStackTrace();
 						read=0;
 					}
 				} else {
@@ -521,6 +524,7 @@ public class Session extends Thread {
 						outputStream.flush();
 
 					} catch (IOException e) {
+						e.printStackTrace();
 						if (socket.isConnected()==false)
 							stop=true;
 					}
@@ -540,6 +544,7 @@ public class Session extends Thread {
 				outputStream.flush();
 
 			} catch (IOException e) {
+				e.printStackTrace();
 				stop=true;
 			}
 			return 0;
@@ -587,20 +592,6 @@ public class Session extends Thread {
 		} else if (flag.compareTo("ACK") == 0) {
 
 			int id = removeDeliveredMessages(rpid);
-//			// All messages are lost should be sent again
-//			index = 0;
-//			while (index < sentBuffer.size()) {
-//				FTSLMessage pkt = sentBuffer.get(index);
-//				if (pkt.getHeader().getPID() > id) {
-//					try {
-//						outputStream.write(pkt.toByte_());
-//						outputStream.flush();
-//					} catch (IOException e) {
-//						e.printStackTrace();
-//					}
-//				}
-//				index++;
-//			}
 
 			return 0;
 
