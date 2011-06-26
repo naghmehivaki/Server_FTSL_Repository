@@ -15,31 +15,32 @@ import util.Logger;
 public class Session extends Thread {
 
 	int DEFAULT_VALUE = 1000;
-	static final int LOGGING_PERIOD = 10;
+	static final int LOGGING_PERIOD = 20;
 	int sleepTime = DEFAULT_VALUE;
 	int MAX_BUFFER_SIZE = 1000;
 	FTSL_Logger logger;
 	Timer timer = new Timer();
-	boolean stop=false;
-	
-	/////////////////////////////// Session Basic Info
+	boolean stop = false;
+	int lastRPID = 0;
+
+	// ///////////////////////////// Session Basic Info
 	ServerSocket serverSocket;
 	Socket socket;
 	ObjectInputStream inputStream = null;
 	ObjectOutputStream outputStream = null;
 	String sessionID = "";
-	
-	////////////////////////////// Packets Info
+
+	// //////////////////////////// Packets Info
 	int lastSentPacketID = 0;
 	int lastRecievedPacketID = 0;
 	Vector<FTSLMessage> sentBuffer = new Vector<FTSLMessage>();
 	HashMap<Integer, String> receivedBuffer = new HashMap<Integer, String>();
-	
-	/////////////////////////////// Messages Info
+
+	// ///////////////////////////// Messages Info
 	int sendMessageID = 1;
 	Vector<MessageInfo> SentMessagesInfo = new Vector<MessageInfo>();
-	
-	/* ***************************** Constructor*/
+
+	/* ***************************** Constructor */
 	public Session() {
 
 	}
@@ -83,18 +84,18 @@ public class Session extends Thread {
 			outputStream = new ObjectOutputStream(socket.getOutputStream());
 			outputStream.flush();
 			inputStream = new ObjectInputStream(socket.getInputStream());
-			
-			String sid=read();
-			
+
+			String sid = read();
+
 			if (sid != "") {
-				sessionID=sid;
-				System.out.println(System.currentTimeMillis());
+				sessionID = sid;
+				// System.out.println(System.currentTimeMillis());
 
 				logger = new FTSL_Logger(sessionID);
 				logger.logSession(this);
-			} 
-			System.out.println(System.currentTimeMillis());
-			
+			}
+			// System.out.println(System.currentTimeMillis());
+
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -105,7 +106,7 @@ public class Session extends Thread {
 
 	}
 
-	/////////////////////// setters and getters
+	// ///////////////////// setters and getters
 
 	public Socket getSocket() {
 		return socket;
@@ -191,8 +192,8 @@ public class Session extends Thread {
 	public void setLastRecievedPacketID(int id) {
 		lastRecievedPacketID = id;
 	}
-	
-	///////////////////////////////////////
+
+	// /////////////////////////////////////
 
 	public void updateSocket(Socket s) {
 		this.socket = s;
@@ -203,10 +204,10 @@ public class Session extends Thread {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	/* ******************************* Operations*/
+
+	/* ******************************* Operations */
 
 	public int increaseLastSentPacketID() {
 		lastSentPacketID++;
@@ -218,28 +219,30 @@ public class Session extends Thread {
 		sendMessageID++;
 		logger.logSessionInfo("SendMessageID", sendMessageID);
 	}
+
 	public void increaseLastRecievedPacketID() {
 		lastRecievedPacketID++;
 		logger.logSessionInfo("lastRecievedPacketID", lastRecievedPacketID);
 	}
+
 	public int increaseLastReceivedPacketID() {
 		lastRecievedPacketID++;
 		logger.logSessionInfo("LastRecievedPacketID", lastRecievedPacketID);
 		return lastRecievedPacketID;
 	}
 
-	
-	////////////////////////////////////////
-	
+	// //////////////////////////////////////
 
 	public void keepSentPacket(int id, FTSLMessage packet) {
 		sentBuffer.add(packet);
 		logger.logSentMessage(packet);
 	}
+
 	public void addreceivedMessage(int id, String str) {
 		receivedBuffer.put(id, str);
 	}
-	////////////////////////////////////////
+
+	// //////////////////////////////////////
 
 	public void sendFTSLRequest() {
 		FTSLHeader header = new FTSLHeader(sessionID, "FTSL_REQUEST", 0,
@@ -276,62 +279,65 @@ public class Session extends Thread {
 		}
 	}
 
-	////////////////////////////////////////
+	// //////////////////////////////////////
 
 	public void addMessageInfo() {
 
-		if (!SentMessagesInfo.isEmpty()) {
-			SentMessagesInfo.lastElement().setEnd(lastSentPacketID - 1);
-			logger.logMessageInfo(SentMessagesInfo.lastElement());
-		}
 		MessageInfo info = new MessageInfo();
-		info.setStart(lastSentPacketID);
-		info.setIndex(lastSentPacketID);
+		if (SentMessagesInfo.isEmpty())
+			info.setStart(1);
+		else
+			info.setStart(SentMessagesInfo.lastElement().getEnd() + 1);
+
 		info.setId(sendMessageID);
+		info.setEnd(lastSentPacketID);
 		SentMessagesInfo.add(info);
 		logger.logMessageInfo(info);
-
 	}
 
 	public void addMessageInfo(MessageInfo info) {
 		SentMessagesInfo.add(info);
 	}
-	
-	public void updateMessageInfo(int pid) {
-		SentMessagesInfo.lastElement().setIndex(pid);
-	}
-	
+
 	////////////////////////////////////////
-	
 
 	public int removeDeliveredMessages(int rpid) {
-		int index = 0;
 		int id = rpid;
-		while (index < SentMessagesInfo.size()) {
-			MessageInfo info = SentMessagesInfo.get(index);
-			if (info.getEnd() != 0 & info.getEnd() <= rpid) {
-				id = info.getEnd();
-				SentMessagesInfo.remove(index);
-			} else
-				index = SentMessagesInfo.size();
-		}
 
-		index = 0;
-		while (index < sentBuffer.size()) {
-			FTSLMessage message = sentBuffer.get(index);
-			if (message.getHeader().getPID() <= id) {
-				sentBuffer.remove(index);
-			} else
-				index = sentBuffer.size();
+		if (rpid > lastRPID) {
+			lastRPID=rpid;
+			int index = 0;
+			while (index < SentMessagesInfo.size()) {
+				MessageInfo info = SentMessagesInfo.get(index);
+				id = info.getEnd();
+				if (id <= rpid) {
+					SentMessagesInfo.remove(index);
+				} else
+					index = SentMessagesInfo.size();
+			}
+
+			index = 0;
+			while (index < sentBuffer.size()) {
+				FTSLMessage message = sentBuffer.get(index);
+				if (message.getHeader().getPID() <= rpid) {
+					sentBuffer.remove(index);
+					System.out.println("########################## 2: "
+							+ sentBuffer.size());
+
+				} else
+					index = sentBuffer.size();
+			}
 		}
 		return id;
+
 	}
 
-	///////////////////////////////////////
+	// /////////////////////////////////////
 
 	public void write(byte[] buffer) {
 
-		while (stop == true);
+		while (stop == true)
+			;
 		buffer = processOutputPacket(buffer);
 		try {
 			outputStream.write(buffer);
@@ -343,24 +349,23 @@ public class Session extends Thread {
 	}
 
 	public byte[] processOutputPacket(byte[] packet) {
-		
+
 		increaseLastSentPacketID();
 		FTSLHeader header = new FTSLHeader(sessionID, "APP", lastSentPacketID,
 				lastRecievedPacketID, packet.length);
 		FTSLMessage pkt = new FTSLMessage(packet, header);
 		byte[] buffer = pkt.toByte_();
 		keepSentPacket(lastSentPacketID, pkt);
-		
+
 		return buffer;
 	}
-	
-		
+
 	public void flush() { // the end of a stream of the message
 		addMessageInfo();
 		increaseSendMessageID();
 	}
-	
-	///////////////////////////////////////
+
+	// /////////////////////////////////////
 	public String read() {
 		byte[] packet = new byte[1024];
 		int read = 0;
@@ -382,13 +387,14 @@ public class Session extends Thread {
 		// Logger.log("Server read the session ID from the client side:\n"+ new
 		// String(packet));
 		FTSLMessage message = FTSLMessage.valueOf_(packet);
-		String flag= message.getHeader().getFLAG();
-		if (flag.compareTo("NTF")==0) {
-			
-			System.out.println(System.currentTimeMillis());
+		String flag = message.getHeader().getFLAG();
+		if (flag.compareTo("NTF") == 0) {
+
+			// System.out.println(System.currentTimeMillis());
 			logger = new FTSL_Logger();
 
-			Session tempSession = logger.initSession(message.getHeader().getSID());
+			Session tempSession = logger.initSession(message.getHeader()
+					.getSID());
 			sessionID = tempSession.getSessionID();
 			lastSentPacketID = tempSession.getLastSentPacketID();
 			lastRecievedPacketID = tempSession.getLastRecievedPacketID();
@@ -396,15 +402,15 @@ public class Session extends Thread {
 			receivedBuffer = tempSession.getReceivedBuffer();
 			sendMessageID = tempSession.getSendMessageID();
 			SentMessagesInfo = tempSession.getSentMessagesInfo();
-		
-			System.out.println(System.currentTimeMillis());
+
+			// System.out.println(System.currentTimeMillis());
 
 			return "";
 		}
 		return message.getHeader().getSID();
 
 	}
-	
+
 	public int read(byte buffer[], int pos, int len) {
 
 		int expectedID = lastRecievedPacketID + 1;
@@ -412,7 +418,7 @@ public class Session extends Thread {
 		if (receivedBuffer.containsKey(expectedID)) {
 			byte[] tempBuffer = receivedBuffer.get(expectedID).getBytes();
 			processInputPacket(tempBuffer);
-		
+
 			for (int i = 0; i < tempBuffer.length; i++)
 				buffer[pos + i] = tempBuffer[i];
 
@@ -427,24 +433,24 @@ public class Session extends Thread {
 					read = inputStream.read(packet);
 				} catch (IOException e) {
 					e.printStackTrace();
-					read=0;
+					read = 0;
 				}
 			}
 
-			System.out.println(new String (packet));
+			// System.out.println(new String (packet));
 			int test = 1;
 			while (read != -1 & test == 1) {
 				int pSize = processInputPacket(packet);
-				System.out.println(new String (packet));
+				// System.out.println(new String (packet));
 
 				if (pSize == 0) {
 					try {
-						System.out.println(new String (packet));
+						// System.out.println(new String (packet));
 
 						read = inputStream.read(packet);
 					} catch (IOException e) {
 						e.printStackTrace();
-						read=0;
+						read = 0;
 					}
 				} else {
 					test = 0;
@@ -456,8 +462,7 @@ public class Session extends Thread {
 			return read;
 		}
 	}
-	
-	
+
 	public int processInputPacket(byte buffer[]) {
 
 		String packet = new String(buffer);
@@ -484,7 +489,6 @@ public class Session extends Thread {
 		}
 	}
 
-	
 	public int processFTSLHeader(byte[] buffer) {
 
 		String packet = new String(buffer);
@@ -507,11 +511,11 @@ public class Session extends Thread {
 				removeDeliveredMessages(rpid);
 				return 1;
 
-			} else if (pid<expectedPID){
-				
+			} else if (pid < expectedPID) {
+
 				return 0;
-				
-			}else {
+
+			} else {
 				receivedBuffer.put(pid, packet);
 				if (!receivedBuffer.containsKey(pid - 1)) {
 					FTSLHeader h = new FTSLHeader(sid, "NAK", pid,
@@ -525,8 +529,8 @@ public class Session extends Thread {
 
 					} catch (IOException e) {
 						e.printStackTrace();
-						if (socket.isConnected()==false)
-							stop=true;
+						if (socket.isConnected() == false)
+							stop = true;
 					}
 				}
 				return 0;
@@ -545,7 +549,7 @@ public class Session extends Thread {
 
 			} catch (IOException e) {
 				e.printStackTrace();
-				stop=true;
+				stop = true;
 			}
 			return 0;
 
@@ -569,10 +573,23 @@ public class Session extends Thread {
 			return 0;
 
 		} else if (flag.compareTo("NTF") == 0) {
-			// server replied to the NTF message of the client
-			// client should remove the buffer and send the messages lost during
-			// the failure
+
 			int id = removeDeliveredMessages(rpid);
+
+			FTSLHeader h = new FTSLHeader(sid, "NTF", 0, lastRecievedPacketID,
+					0);
+
+			FTSLMessage ftslPacket = new FTSLMessage(null, h);
+
+			try {
+				outputStream.write(ftslPacket.toByte_());
+				outputStream.flush();
+
+			} catch (IOException e) {
+				e.printStackTrace();
+				stop = true;
+			}
+
 			index = 0;
 			while (index < sentBuffer.size()) {
 				FTSLMessage pkt = sentBuffer.get(index);
@@ -619,8 +636,8 @@ public class Session extends Thread {
 		return 0;
 	}
 
-	/////////////////////////////////////////////////
-	
+	// ///////////////////////////////////////////////
+
 	class logTask extends TimerTask {
 		Session session;
 		FTSL_Logger logger;
@@ -644,6 +661,5 @@ public class Session extends Thread {
 			e.printStackTrace();
 		}
 	}
-
 
 }

@@ -4,18 +4,11 @@ public class MessageInfo {
 	
 	int start=0;
 	int end=0;
-	int index=0;
 	int id=0;
 	
 	
 	public int getStart() {
 		return start;
-	}
-	public int getIndex() {
-		return index;
-	}
-	public void setIndex(int index) {
-		this.index = index;
 	}
 	public int getId() {
 		return id;
@@ -43,7 +36,6 @@ public class MessageInfo {
 		String str="";
 		str=str+String.valueOf(start)+" ";
 		str=str+String.valueOf(end)+" ";
-		str=str+String.valueOf(index)+" ";
 		str=str+String.valueOf(id);
 		return str;
 	}
@@ -54,9 +46,6 @@ public class MessageInfo {
 		str=str.substring(index+1);
 		index=str.indexOf(" ");
 		info.setEnd(Integer.valueOf(str.substring(0,index)));
-		str=str.substring(index+1);
-		index=str.indexOf(" ");
-		info.setIndex(Integer.valueOf(str.substring(0,index)));
 		info.setId(Integer.valueOf(str.substring(index+1)));
 
 		return info;
