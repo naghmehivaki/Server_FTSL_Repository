@@ -15,7 +15,7 @@ import util.Logger;
 public class Session extends Thread {
 
 	int DEFAULT_VALUE = 1000;
-	static final int LOGGING_PERIOD = 20;
+	static final int LOGGING_PERIOD = 10;
 	int sleepTime = DEFAULT_VALUE;
 	int MAX_BUFFER_SIZE = 1000;
 	FTSL_Logger logger;
@@ -403,7 +403,7 @@ public class Session extends Thread {
 			sendMessageID = tempSession.getSendMessageID();
 			SentMessagesInfo = tempSession.getSentMessagesInfo();
 
-			// System.out.println(System.currentTimeMillis());
+			System.out.println(System.currentTimeMillis());
 
 			return "";
 		}
