@@ -319,13 +319,12 @@ public class Session extends Thread {
 				if (message.getHeader().getPID() <= id) {
 					sentBuffer.remove(index);
 //					Logger.log("######## removing: " + message.getHeader().getPID());
-
+					
 				} else
 					index = sentBuffer.size();
 			}
 		}
 		return id;
-
 	}
 
 	// /////////////////////////////////////
@@ -353,7 +352,7 @@ public class Session extends Thread {
 		FTSLMessage pkt = new FTSLMessage(packet, header);
 		byte[] buffer = pkt.toByte_();
 		keepSentPacket(lastSentPacketID, pkt);
-
+		
 		return buffer;
 	}
 
@@ -391,7 +390,6 @@ public class Session extends Thread {
 			
 			logger = new FTSL_Logger();
 			// System.out.println(System.currentTimeMillis());
-			
 			Session tempSession = logger.initSession(sessionID);
 
 			if (tempSession != null) {
@@ -405,7 +403,6 @@ public class Session extends Thread {
 				tempSession=null;
 				processFTSLHeader(packet);
 			}
-
 			//System.out.println(System.currentTimeMillis());
 		}
 		else {
