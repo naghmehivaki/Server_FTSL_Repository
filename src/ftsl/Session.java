@@ -389,7 +389,6 @@ public class Session extends Thread {
 		if (flag.compareTo("NTF") == 0) {
 			
 			logger = new FTSL_Logger();
-			// System.out.println(System.currentTimeMillis());
 			Session tempSession = logger.initSession(sessionID);
 
 			if (tempSession != null) {
@@ -403,7 +402,6 @@ public class Session extends Thread {
 				tempSession=null;
 				processFTSLHeader(packet);
 			}
-			//System.out.println(System.currentTimeMillis());
 		}
 		else {
 			
@@ -663,6 +661,34 @@ public class Session extends Thread {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	///////////////////////////////////////////// Transactional Part
+	
+	public void commit(){
+		
+	}
+	public void abort(){
+		
+	}
+	public void commit(String str){
+		
+	}
+	public void commit(byte[] str){
+		
+	}
+	public void confirm(){
+		
+	}
+	public void supportTransaction(boolean b){
+		
+	}
+	
+	public void setTransactionTimeout(int time){
+		
+	}
+	public void rollBack(){
+		
 	}
 
 }
