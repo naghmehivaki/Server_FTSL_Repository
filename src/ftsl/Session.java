@@ -23,8 +23,10 @@ public class Session extends Thread {
 	boolean stop = false;
 	int lastRPID = 0;
 	int lastEnd = 0;
+	int MAX_WAIT_TIME = 1000; // seconds
+	boolean isTransactional = false;
 
-	// ///////////////////////////// Session Basic Info
+	/////////////////////////////// Session Basic Info
 	ServerSocket serverSocket;
 	Socket socket;
 	ObjectInputStream inputStream = null;
@@ -38,7 +40,7 @@ public class Session extends Thread {
 	HashMap<Integer, String> receivedBuffer = new HashMap<Integer, String>();
 
 	// ///////////////////////////// Messages Info
-	int sendMessageID = 1;
+	int sendMessageID = 0;
 	Vector<MessageInfo> SentMessagesInfo = new Vector<MessageInfo>();
 
 	/* ***************************** Constructor */
@@ -78,9 +80,13 @@ public class Session extends Thread {
 
 	}
 
-	public Session(Socket s) {
+	public Session(Socket s, boolean t, int time) {
 		try {
-
+			
+			isTransactional=t;
+			if (time!=-1)
+				MAX_WAIT_TIME=time;
+			
 			socket = s;
 			outputStream = new ObjectOutputStream(socket.getOutputStream());
 			outputStream.flush();
@@ -101,6 +107,10 @@ public class Session extends Thread {
 
 	// ///////////////////// setters and getters
 
+	public void setTimeut(int time){
+		MAX_WAIT_TIME=time;
+	}
+	
 	public Socket getSocket() {
 		return socket;
 	}
@@ -343,6 +353,22 @@ public class Session extends Thread {
 			stop = true;
 		}
 	}
+	
+	public void write(byte[] buffer, int time) {
+
+		MAX_WAIT_TIME=time;
+		while (stop == true);
+		buffer = processOutputPacket(buffer);
+		try {
+			outputStream.write(buffer);
+			outputStream.flush();
+			System.out.println(new String(buffer));
+		} catch (IOException e) {
+			Logger.log("server stopped here");
+			e.printStackTrace();
+			stop = true;
+		}
+	}
 
 	public byte[] processOutputPacket(byte[] packet) {
 
@@ -461,6 +487,61 @@ public class Session extends Thread {
 		}
 	}
 
+	public int read(byte buffer[], int pos, int len, int time) {
+		
+		MAX_WAIT_TIME=time;
+
+		int expectedID = lastRecievedPacketID + 1;
+		if (receivedBuffer.containsKey(expectedID)) {
+
+			byte[] tempBuffer = receivedBuffer.get(expectedID).getBytes();
+			processInputPacket(tempBuffer);
+
+			for (int i = 0; i < tempBuffer.length; i++)
+				buffer[pos + i] = tempBuffer[i];
+
+			return tempBuffer.length;
+
+		} else {
+
+			int read = 0;
+			byte[] packet = new byte[len];
+
+			while (read == 0) {
+				try {
+					read = inputStream.read(packet);
+				} catch (IOException e) {
+					e.printStackTrace();
+					read = 0;
+				}
+			}
+
+			int test = 1;
+			while (read != -1 & test == 1) {
+				int pSize = processInputPacket(packet);
+				// System.out.println(new String (packet));
+
+				if (pSize == 0) {
+					try {
+						// System.out.println(new String (packet));
+
+						read = inputStream.read(packet);
+					} catch (IOException e) {
+						e.printStackTrace();
+						read = 0;
+					}
+				} else {
+					test = 0;
+					read = pSize;
+					for (int i = 0; i < read; i++)
+						buffer[pos + i] = packet[i];
+				}
+			}
+			return read;
+		}
+	}
+
+	
 	public int processInputPacket(byte buffer[]) {
 
 		String packet = new String(buffer);

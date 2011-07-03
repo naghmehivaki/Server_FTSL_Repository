@@ -5,6 +5,7 @@ import java.io.Serializable;
 
 public class FTSLHeader implements Serializable {
 
+	
 	static String protocol="FTSL-1.0";
 	
 	String SID;
@@ -19,32 +20,22 @@ public class FTSLHeader implements Serializable {
 	String FLAG = "";
 	int PID = 1;
 	int rPID = 0;
-	int MessageSize=0;
+	//int MessageSize=0;
 	
-
-	/* *************************** Constructors*/
-	
-	public FTSLHeader(String sid, String flag, int pid, int rpid, int size) {
-		this.SID = sid;
-		this.FLAG=flag;
-		this.PID = pid;
-		this.rPID = rpid;
-		this.MessageSize=size;
-
-	}
 	public FTSLHeader(String sid, String flag, int pid, int rpid) {
 		this.SID = sid;
 		this.FLAG=flag;
 		this.PID = pid;
 		this.rPID = rpid;
-		this.MessageSize=0;
+	//	this.MessageSize=size;
+
 	}
+	
 	public FTSLHeader(String sid, String flag, int rpid) {
 		this.SID = sid;
 		this.FLAG=flag;
 		this.PID = 0;
 		this.rPID = rpid;
-		this.MessageSize=0;
 	}
 
 	public String getProtocol() {
@@ -95,22 +86,12 @@ public class FTSLHeader implements Serializable {
 
 	}
 	
-
-	public int getMessageSize() {
-		return MessageSize;
-	}
-
-	public void setMessageSize(int messageSize) {
-		MessageSize = messageSize;
-	}
-
 	public String toString_() {
 		String sid = this.SID;
 		String pid = String.valueOf(this.PID);
 		String rpid = String.valueOf(this.rPID);
-		String size = String.valueOf(this.MessageSize);
 
-		String header = protocol+" "+sid + " " +this.FLAG+" "+ pid + " " + rpid+ " " + size;
+		String header = protocol+" "+sid + " " +this.FLAG+" "+ pid + " " + rpid;
 		return header;
 	}
 
@@ -134,10 +115,7 @@ public class FTSLHeader implements Serializable {
 		str=str.substring(index + 1);
 		index = str.indexOf(" ");
 		header.setPID(Integer.valueOf(str.substring(0, index)));
-		str=str.substring(index + 1);
-		index = str.indexOf(" ");
-		header.setrPID(Integer.valueOf(str.substring(0, index)));
-		header.setMessageSize(Integer.valueOf(str.substring(index + 1)));
+		header.setrPID(Integer.valueOf(str.substring(index+1)));
 		return header;
 	}
 

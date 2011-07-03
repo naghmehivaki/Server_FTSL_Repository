@@ -4,17 +4,27 @@ import java.io.Serializable;
 
 public class FTSLMessage implements Serializable {
 
-	byte[] data;
 	FTSLHeader aslHeader;
+	MessageProperties properties;
+	byte[] data;
 
+	public FTSLMessage(byte[] d, FTSLHeader header, MessageProperties p) {
+		this.data = d;
+		this.aslHeader = header;
+		this.properties=p;
+
+	}
 	public FTSLMessage(byte[] d, FTSLHeader header) {
 		this.data = d;
 		this.aslHeader = header;
+		properties=new MessageProperties();
 
 	}
-
+	
 	public FTSLMessage() {
 	}
+	
+	/////////////////////////////////////// Setters and getters
 
 	public void setData(byte[] d) {
 		this.data = d;
@@ -31,6 +41,9 @@ public class FTSLMessage implements Serializable {
 	public FTSLHeader getHeader() {
 		return this.aslHeader;
 	}
+	
+	
+	////////////////////////////// operations
 
 	public String toString_() {
 
