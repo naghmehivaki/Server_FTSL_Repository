@@ -4,19 +4,20 @@ import java.io.Serializable;
 
 public class FTSLMessage implements Serializable {
 
-	FTSLHeader aslHeader;
+	FTSLHeader header;
 	MessageProperties properties;
 	byte[] data;
 
 	public FTSLMessage(byte[] d, FTSLHeader header, MessageProperties p) {
 		this.data = d;
-		this.aslHeader = header;
+		this.header = header;
 		this.properties=p;
 
 	}
+	
 	public FTSLMessage(byte[] d, FTSLHeader header) {
 		this.data = d;
-		this.aslHeader = header;
+		this.header = header;
 		properties=new MessageProperties();
 
 	}
@@ -30,28 +31,34 @@ public class FTSLMessage implements Serializable {
 		this.data = d;
 	}
 
-	public void setAslHeader(FTSLHeader header) {
-		this.aslHeader = header;
-	}
-
 	public byte[] getData() {
 		return this.data;
 	}
 
-	public FTSLHeader getHeader() {
-		return this.aslHeader;
+	public void setHeader(FTSLHeader h) {
+		header = h;
 	}
-	
-	
+	public FTSLHeader getHeader() {
+		return header;
+	}
+	public MessageProperties getProperties() {
+		return properties;
+	}
+
+	public void setProperties(MessageProperties properties) {
+		this.properties = properties;
+	}
 	////////////////////////////// operations
 
+	
 	public String toString_() {
 
 		String msgBody="";
 		if (this.data != null)
 			msgBody = new String(this.data);
-		String msgHeader = this.aslHeader.toString_();
-		String message= msgHeader + "\n" + msgBody;
+		String msgHeader = header.toString_();
+		String msgProperties = properties.toString_();
+		String message= msgHeader + " | "+ msgProperties + "\n" + msgBody;
 
 		return message;
 	}
@@ -65,8 +72,11 @@ public class FTSLMessage implements Serializable {
 
 	public static FTSLMessage valueOf_(String str) {
 		FTSLMessage message = new FTSLMessage();
-		int index = str.indexOf("\n");
-		message.setAslHeader(FTSLHeader.valueOf_(str.substring(0, index)));
+		int index = str.indexOf("|");
+		message.setHeader(FTSLHeader.valueOf_(str.substring(0, index-1)));
+		str=str.substring(index+2);
+		index=str.indexOf("\n");
+		message.setProperties(MessageProperties.valueOf_(str.substring(0,index)));
 		message.setData(str.substring(index + 1).getBytes());
 		return message;
 	}

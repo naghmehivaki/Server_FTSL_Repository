@@ -20,15 +20,12 @@ public class FTSLHeader implements Serializable {
 	String FLAG = "";
 	int PID = 1;
 	int rPID = 0;
-	//int MessageSize=0;
 	
 	public FTSLHeader(String sid, String flag, int pid, int rpid) {
 		this.SID = sid;
 		this.FLAG=flag;
 		this.PID = pid;
 		this.rPID = rpid;
-	//	this.MessageSize=size;
-
 	}
 	
 	public FTSLHeader(String sid, String flag, int rpid) {

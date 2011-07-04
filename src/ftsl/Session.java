@@ -249,7 +249,7 @@ public class Session extends Thread {
 
 	public void sendFTSLRequest() {
 		FTSLHeader header = new FTSLHeader(sessionID, "FTSL_REQUEST", 0,
-				lastRecievedPacketID, 0);
+				lastRecievedPacketID);
 
 		FTSLMessage packet = new FTSLMessage(null, header);
 		byte[] buffer = packet.toByte_();
@@ -267,7 +267,7 @@ public class Session extends Thread {
 
 	public void sendFTSLReply() {
 		FTSLHeader header = new FTSLHeader(sessionID, "FTSL_REPLY", 0,
-				lastRecievedPacketID, 0);
+				lastRecievedPacketID);
 
 		FTSLMessage packet = new FTSLMessage(null, header);
 		byte[] buffer = packet.toByte_();
@@ -374,7 +374,7 @@ public class Session extends Thread {
 
 		increaseLastSentPacketID();
 		FTSLHeader header = new FTSLHeader(sessionID, "APP", lastSentPacketID,
-				lastRecievedPacketID, packet.length);
+				lastRecievedPacketID);
 		FTSLMessage pkt = new FTSLMessage(packet, header);
 		byte[] buffer = pkt.toByte_();
 		keepSentPacket(lastSentPacketID, pkt);
@@ -599,7 +599,7 @@ public class Session extends Thread {
 				receivedBuffer.put(pid, packet);
 				if (!receivedBuffer.containsKey(pid - 1)) {
 					FTSLHeader h = new FTSLHeader(sid, "NAK", pid,
-							lastRecievedPacketID, 0);
+							lastRecievedPacketID);
 					FTSLMessage ftslPacket = new FTSLMessage(null, h);
 
 					try {
@@ -618,8 +618,7 @@ public class Session extends Thread {
 
 		} else if (flag.compareTo("REQ") == 0) {
 
-			FTSLHeader h = new FTSLHeader(sid, "REP", 0, lastRecievedPacketID,
-					0);
+			FTSLHeader h = new FTSLHeader(sid, "REP", 0, lastRecievedPacketID);
 
 			FTSLMessage ftslPacket = new FTSLMessage(null, h);
 
@@ -656,8 +655,7 @@ public class Session extends Thread {
 
 			//int id = removeDeliveredMessages(rpid);
 
-			FTSLHeader h = new FTSLHeader(sid, "NTF", 0, lastRecievedPacketID,
-					0);
+			FTSLHeader h = new FTSLHeader(sid, "NTF", 0, lastRecievedPacketID);
 
 			Logger.log("LastRecievedPacketID: "+lastRecievedPacketID);
 			FTSLMessage ftslPacket = new FTSLMessage(null, h);

@@ -41,7 +41,7 @@ public class MessageProperties {
 		return toString_().getBytes();
 	}
 	
-	public MessageProperties valueOf_(String str){
+	public static MessageProperties valueOf_(String str){
 		MessageProperties mp=new MessageProperties();
 		int index=str.indexOf(" ");
 		if (index!=-1){
@@ -60,7 +60,7 @@ public class MessageProperties {
 		return mp;
 	}
 	
-	public MessageProperties valueOf_(byte[] b){
+	public static MessageProperties valueOf_(byte[] b){
 		return	valueOf_(new String(b));	
 	}
 
