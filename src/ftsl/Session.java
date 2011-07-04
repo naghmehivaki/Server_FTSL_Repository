@@ -35,6 +35,7 @@ public class Session extends Thread {
 
 	// //////////////////////////// Packets Info
 	int lastSentPacketID = 0;
+	int eoTheLastSentMessage = 0;
 	int lastRecievedPacketID = 0;
 	Vector<FTSLMessage> sentBuffer = new Vector<FTSLMessage>();
 	HashMap<Integer, String> receivedBuffer = new HashMap<Integer, String>();
@@ -540,7 +541,6 @@ public class Session extends Thread {
 			return read;
 		}
 	}
-
 	
 	public int processInputPacket(byte buffer[]) {
 
