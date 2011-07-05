@@ -6,13 +6,30 @@ public class MessageProperties {
 	boolean eom=false;
 	boolean reSent=false;
 
-	public boolean isEom() {
+	///////////////////////////////////// Constructors
+	public MessageProperties() {
+	}
+	public MessageProperties(int size) {
+		this.size = size;
+	}
+	public MessageProperties(int size, boolean eom) {
+		this.size = size;
+		this.eom = eom;
+	}
+	public MessageProperties(int size, boolean eom, boolean reSent) {
+		this.size = size;
+		this.eom = eom;
+		this.reSent = reSent;
+	}
+	
+	///////////////////////////////////// Setters and getters
+	public boolean getEom(){
 		return eom;
 	}
 	public void setEom(boolean eom) {
 		this.eom = eom;
 	}
-	public boolean isReSent() {
+	public boolean getReSent(){
 		return reSent;
 	}
 	public void setReSent(boolean reSent) {
@@ -23,6 +40,14 @@ public class MessageProperties {
 	}
 	public void setSize(int size) {
 		this.size = size;
+	}
+	
+	//////////////////////////// Operations 
+	public boolean isEom() {
+		return eom;
+	}
+	public boolean isReSent() {
+		return reSent;
 	}
 	
 	public String toString_(){
@@ -60,7 +85,7 @@ public class MessageProperties {
 		return mp;
 	}
 	
-	public static MessageProperties valueOf_(byte[] b){
+	public MessageProperties valueOf_(byte[] b){
 		return	valueOf_(new String(b));	
 	}
 

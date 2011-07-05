@@ -8,7 +8,7 @@ public class FTSLMessage implements Serializable {
 	MessageProperties properties;
 	byte[] data;
 
-	public FTSLMessage(byte[] d, FTSLHeader header, MessageProperties p) {
+	public FTSLMessage(FTSLHeader header, MessageProperties p, byte[] d) {
 		this.data = d;
 		this.header = header;
 		this.properties=p;
@@ -57,8 +57,14 @@ public class FTSLMessage implements Serializable {
 		if (this.data != null)
 			msgBody = new String(this.data);
 		String msgHeader = header.toString_();
-		String msgProperties = properties.toString_();
-		String message= msgHeader + " | "+ msgProperties + "\n" + msgBody;
+		String message="";
+		if (properties != null){
+			String msgProperties = properties.toString_();
+			message= msgHeader + " | "+ msgProperties + "\n" + msgBody;
+		}
+		else {
+			message= msgHeader + "\n" + msgBody;
+		}
 
 		return message;
 	}

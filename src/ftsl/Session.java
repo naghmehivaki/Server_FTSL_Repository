@@ -20,7 +20,8 @@ public class Session extends Thread {
 	int MAX_BUFFER_SIZE = 1000;
 	FTSL_Logger logger;
 	Timer timer = new Timer();
-	boolean stop = false;
+	boolean stopReading = false;
+	boolean stopWriting = false;
 	int lastRPID = 0;
 	int lastEnd = 0;
 	int MAX_WAIT_TIME = 1000; // seconds
@@ -37,6 +38,7 @@ public class Session extends Thread {
 	int lastSentPacketID = 0;
 	int eoTheLastSentMessage = 0;
 	int lastRecievedPacketID = 0;
+	int eoTheLastRecievedMessage = 0;
 	Vector<FTSLMessage> sentBuffer = new Vector<FTSLMessage>();
 	HashMap<Integer, String> receivedBuffer = new HashMap<Integer, String>();
 
@@ -237,7 +239,7 @@ public class Session extends Thread {
 
 	// //////////////////////////////////////
 
-	public void keepSentPacket(int id, FTSLMessage packet) {
+	public void keepSentPacket(FTSLMessage packet) {
 		sentBuffer.add(packet);
 		logger.logSentMessage(packet);
 	}
@@ -342,7 +344,7 @@ public class Session extends Thread {
 
 	public void write(byte[] buffer) {
 
-		while (stop == true);
+		while (stopWriting == true);
 		buffer = processOutputPacket(buffer);
 		try {
 			outputStream.write(buffer);
@@ -351,14 +353,53 @@ public class Session extends Thread {
 		} catch (IOException e) {
 			Logger.log("server stopped here");
 			e.printStackTrace();
-			stop = true;
+			stopWriting = true;
+		}
+	}
+	
+	public void write(byte[] buffer, boolean endOfMsg) {
+
+		while (stopWriting == true);
+	
+		buffer = processOutputPacket(buffer, endOfMsg);
+		try {
+			outputStream.write(buffer);
+			outputStream.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+			stopReading = true;
+			stopWriting = true;
+		}
+		if (endOfMsg) {
+			eoTheLastSentMessage=lastSentPacketID;
+			addMessageInfo();
+			increaseSendMessageID();
+		}
+	}
+	public void write(byte[] buffer, boolean endOfMsg, int time) {
+
+		MAX_WAIT_TIME=time;
+		while (stopWriting == true);
+	
+		buffer = processOutputPacket(buffer, endOfMsg);
+		try {
+			outputStream.write(buffer);
+			outputStream.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+			stopReading = true;
+			stopWriting = true;
+		}
+		if (endOfMsg) {
+			addMessageInfo();
+			increaseSendMessageID();
 		}
 	}
 	
 	public void write(byte[] buffer, int time) {
 
 		MAX_WAIT_TIME=time;
-		while (stop == true);
+		while (stopWriting== true);
 		buffer = processOutputPacket(buffer);
 		try {
 			outputStream.write(buffer);
@@ -367,7 +408,7 @@ public class Session extends Thread {
 		} catch (IOException e) {
 			Logger.log("server stopped here");
 			e.printStackTrace();
-			stop = true;
+			stopWriting = true;
 		}
 	}
 
@@ -376,12 +417,30 @@ public class Session extends Thread {
 		increaseLastSentPacketID();
 		FTSLHeader header = new FTSLHeader(sessionID, "APP", lastSentPacketID,
 				lastRecievedPacketID);
-		FTSLMessage pkt = new FTSLMessage(packet, header);
+		MessageProperties properties= new MessageProperties(packet.length);
+		FTSLMessage pkt = new FTSLMessage(header, properties, packet);
 		byte[] buffer = pkt.toByte_();
-		keepSentPacket(lastSentPacketID, pkt);
-		
+
+		keepSentPacket(pkt);
+
 		return buffer;
+
 	}
+	public byte[] processOutputPacket(byte[] packet, boolean endOfMsg) {
+
+		increaseLastSentPacketID();
+		FTSLHeader header = new FTSLHeader(sessionID, "APP", lastSentPacketID,
+				lastRecievedPacketID);
+		MessageProperties properties= new MessageProperties(packet.length, endOfMsg);
+		FTSLMessage pkt = new FTSLMessage(header, properties, packet);
+		byte[] buffer = pkt.toByte_();
+
+		keepSentPacket(pkt);
+
+		return buffer;
+
+	}
+
 
 	public void flush() { // the end of a stream of the message
 		addMessageInfo();
@@ -610,7 +669,7 @@ public class Session extends Thread {
 					} catch (IOException e) {
 						e.printStackTrace();
 						if (socket.isConnected() == false)
-							stop = true;
+							stopReading = true;
 					}
 				}
 				return 0;
@@ -628,7 +687,7 @@ public class Session extends Thread {
 
 			} catch (IOException e) {
 				e.printStackTrace();
-				stop = true;
+				stopReading = true;
 			}
 			return 0;
 
@@ -667,7 +726,7 @@ public class Session extends Thread {
 
 			} catch (IOException e) {
 				e.printStackTrace();
-				stop = true;
+				stopReading = true;
 			}
 
 			index = 0;
