@@ -1,22 +1,22 @@
 package ftsl;
 
-public class MessageProperties {
+public class MessageHandler {
 
 	int size=0;
 	boolean eom=false;
 	boolean reSent=false;
 
 	///////////////////////////////////// Constructors
-	public MessageProperties() {
+	public MessageHandler() {
 	}
-	public MessageProperties(int size) {
+	public MessageHandler(int size) {
 		this.size = size;
 	}
-	public MessageProperties(int size, boolean eom) {
+	public MessageHandler(int size, boolean eom) {
 		this.size = size;
 		this.eom = eom;
 	}
-	public MessageProperties(int size, boolean eom, boolean reSent) {
+	public MessageHandler(int size, boolean eom, boolean reSent) {
 		this.size = size;
 		this.eom = eom;
 		this.reSent = reSent;
@@ -66,8 +66,8 @@ public class MessageProperties {
 		return toString_().getBytes();
 	}
 	
-	public static MessageProperties valueOf_(String str){
-		MessageProperties mp=new MessageProperties();
+	public static MessageHandler valueOf_(String str){
+		MessageHandler mp=new MessageHandler();
 		int index=str.indexOf(" ");
 		if (index!=-1){
 			mp.setSize(Integer.valueOf(str.substring(0,index)));
@@ -85,7 +85,7 @@ public class MessageProperties {
 		return mp;
 	}
 	
-	public MessageProperties valueOf_(byte[] b){
+	public MessageHandler valueOf_(byte[] b){
 		return	valueOf_(new String(b));	
 	}
 
