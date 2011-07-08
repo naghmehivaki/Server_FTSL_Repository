@@ -12,14 +12,12 @@ public class FTSLMessage implements Serializable {
 		this.data = d;
 		this.header = header;
 		this.properties=p;
-
 	}
 	
 	public FTSLMessage(byte[] d, FTSLHeader header) {
 		this.data = d;
 		this.header = header;
 		properties=new MessageHandler();
-
 	}
 	
 	public FTSLMessage() {

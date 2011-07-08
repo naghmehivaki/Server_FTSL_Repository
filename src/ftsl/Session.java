@@ -502,6 +502,11 @@ public class Session extends Thread {
 			eoTheLastRecievedMessage=lastRecievedPacketID;
 	}
 	
+	public void confirm(int messageID){
+		if (!isTransactional)
+			eoTheLastRecievedMessage=lastRecievedPacketID;
+	}
+	
 	public MessageHandler read(byte buffer[], int pos, int len) {
 
 		while (stopReading == true){
@@ -837,7 +842,14 @@ public class Session extends Thread {
 	public void commit(){
 		eoTheLastRecievedMessage=lastRecievedPacketID;
 	}
+	public void commit(int messageID){
+		eoTheLastRecievedMessage=lastRecievedPacketID;
+	}
 	public void abort(){
+		// resends the request again
+		// should keep the request completely then 
+	}
+	public void abort(int messageID){
 		// resends the request again
 		// should keep the request completely then 
 	}

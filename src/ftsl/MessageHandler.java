@@ -2,12 +2,17 @@ package ftsl;
 
 public class MessageHandler {
 
+	int messageID;
 	int size=0;
 	boolean eom=false;
 	boolean reSent=false;
+	Session sessionRef;
 
 	///////////////////////////////////// Constructors
 	public MessageHandler() {
+	}
+	public MessageHandler(Session s) {
+		sessionRef=s;
 	}
 	public MessageHandler(int size) {
 		this.size = size;
@@ -41,8 +46,21 @@ public class MessageHandler {
 	public void setSize(int size) {
 		this.size = size;
 	}
+	public int getMessageID() {
+		return messageID;
+	}
+	public void setMessageID(int messageID) {
+		this.messageID = messageID;
+	}
+	public Session getSessionRef() {
+		return sessionRef;
+	}
+	public void setSessionRef(Session sessionRef) {
+		this.sessionRef = sessionRef;
+	}
 	
 	//////////////////////////// Operations 
+	
 	public boolean isEom() {
 		return eom;
 	}
@@ -54,9 +72,9 @@ public class MessageHandler {
 		String str="";
 		str=String.valueOf(size);
 		if (eom)
-			str=str+" "+eom;
+			str=str+" "+"1";
 		if (reSent)
-			str=str+" "+reSent;
+			str=str+" "+"1";
 		
 		return str;
 		
@@ -87,6 +105,18 @@ public class MessageHandler {
 	
 	public MessageHandler valueOf_(byte[] b){
 		return	valueOf_(new String(b));	
+	}
+	
+	//////////////////////////////////////////// Transaction Support
+	
+	public void commit(){
+		sessionRef.commit(messageID);
+	}
+	public void abort(){
+		sessionRef.abort(messageID);
+	}
+	public void confirm(){
+		sessionRef.confirm(messageID);
 	}
 
 }
