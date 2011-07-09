@@ -63,12 +63,10 @@ public class FTSLMessage implements Serializable {
 		else {
 			message= msgHeader + "\n" + msgBody;
 		}
-
 		return message;
 	}
 
 	public byte[] toByte_() {
-
 		String str = this.toString_();
 		byte[] message = str.getBytes();
 		return message;
