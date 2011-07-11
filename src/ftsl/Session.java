@@ -418,7 +418,7 @@ public class Session extends Thread {
 		increaseLastSentPacketID();
 		FTSLHeader header = new FTSLHeader(sessionID, "APP", lastSentPacketID,
 				lastRecievedPacketID);
-		MessageHandler properties= new MessageHandler(packet.length);
+		MessageProperties properties= new MessageProperties(packet.length);
 		FTSLMessage pkt = new FTSLMessage(header, properties, packet);
 		byte[] buffer = pkt.toByte_();
 
@@ -432,7 +432,7 @@ public class Session extends Thread {
 		increaseLastSentPacketID();
 		FTSLHeader header = new FTSLHeader(sessionID, "APP", lastSentPacketID,
 				lastRecievedPacketID);
-		MessageHandler properties= new MessageHandler(packet.length, endOfMsg);
+		MessageProperties properties= new MessageProperties(packet.length, endOfMsg);
 		FTSLMessage pkt = new FTSLMessage(header, properties, packet);
 		byte[] buffer = pkt.toByte_();
 
@@ -523,7 +523,8 @@ public class Session extends Thread {
 			for (int i = 0; i < tempBuffer.length; i++)
 				buffer[pos + i] = tempBuffer[i];
 
-			return message.getProperties();
+			MessageHandler msgHandler=new MessageHandler(this, expectedID,message.getProperties());
+			return msgHandler;
 
 		} else {
 			int read = 0;
@@ -538,7 +539,7 @@ public class Session extends Thread {
 			}
 
 			int test = 1;
-			MessageHandler msgProperties=new MessageHandler();
+			MessageProperties msgProperties=new MessageProperties();
 			while (read != -1 & test == 1) {
 				
 				if (read !=0)
@@ -565,7 +566,8 @@ public class Session extends Thread {
 					read=0;
 			}
 			Logger.log("####### returning it");
-			return msgProperties;
+			MessageHandler msgHandler=new MessageHandler(this, expectedID, msgProperties);
+			return msgHandler;
 		}
 	}
 	
@@ -586,7 +588,8 @@ public class Session extends Thread {
 			for (int i = 0; i < tempBuffer.length; i++)
 				buffer[pos + i] = tempBuffer[i];
 
-			return message.getProperties();
+			MessageHandler msgHandler=new MessageHandler(this, expectedID,message.getProperties());
+			return msgHandler;
 
 		} else {
 			int read = 0;
@@ -601,7 +604,7 @@ public class Session extends Thread {
 			}
 
 			int test = 1;
-			MessageHandler msgProperties=new MessageHandler();
+			MessageProperties msgProperties=new MessageProperties();
 			while (read != -1 & test == 1) {
 				
 				if (read !=0)
@@ -628,14 +631,15 @@ public class Session extends Thread {
 					read=0;
 			}
 			Logger.log("####### returning it");
-			return msgProperties;
+			MessageHandler msgHandler=new MessageHandler(this, expectedID, msgProperties);
+			return msgHandler;
 		}
 	}
 	
 
-	public MessageHandler processInputPacket(byte buffer[]) {
+	public MessageProperties processInputPacket(byte buffer[]) {
 
-		MessageHandler msgProperties=new MessageHandler();
+		MessageProperties msgProperties=new MessageProperties();
 		String packet = new String(buffer);
 		if (!packet.startsWith(FTSLHeader.protocol))
 			return msgProperties;
@@ -658,7 +662,7 @@ public class Session extends Thread {
 			for (int i = 0; i < tempBody.length; i++)
 				buffer[i] = tempBody[i];
 
-			msgProperties = MessageHandler.valueOf_(p);
+			msgProperties = MessageProperties.valueOf_(p);
 			return msgProperties;
 		}
 	}
@@ -666,10 +670,10 @@ public class Session extends Thread {
 	public int processFTSLHeader(byte[] buffer) {
 
 		String packet = new String(buffer);
-		int index = packet.indexOf("\n");
-		String str = packet.substring(0, index);
+		FTSLMessage ftslMessage= FTSLMessage.valueOf_(buffer);
+		
 
-		FTSLHeader header = FTSLHeader.valueOf_(str);
+		FTSLHeader header = ftslMessage.getHeader();
 
 		String flag = header.getFLAG();
 		String sid = header.getSID();
@@ -731,7 +735,7 @@ public class Session extends Thread {
 
 			removeDeliveredMessages(rpid);
 
-			index = 0;
+			int index = 0;
 			while (index < sentBuffer.size()) {
 				FTSLMessage pkt = sentBuffer.get(index);
 				if (pkt.getHeader().getPID() > rpid) {
@@ -765,7 +769,7 @@ public class Session extends Thread {
 				stopReading = true;
 			}
 
-			index = 0;
+			int index = 0;
 			while (index < sentBuffer.size()) {
 				FTSLMessage pkt = sentBuffer.get(index);
 				if (pkt.getHeader().getPID() > rpid) {
@@ -790,7 +794,7 @@ public class Session extends Thread {
 		} else if (flag.compareTo("NAK") == 0) {
 			removeDeliveredMessages(rpid);
 			// all messages are lost should be sent again
-			index = 0;
+			int index = 0;
 			while (index < sentBuffer.size()) {
 				FTSLMessage pkt = sentBuffer.get(index);
 				int id = pkt.getHeader().getPID();

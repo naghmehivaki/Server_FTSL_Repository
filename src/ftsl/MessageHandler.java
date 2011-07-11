@@ -3,49 +3,30 @@ package ftsl;
 public class MessageHandler {
 
 	int messageID;
-	int size=0;
-	boolean eom=false;
-	boolean reSent=false;
+	MessageProperties properties;
 	Session sessionRef;
 
 	///////////////////////////////////// Constructors
 	public MessageHandler() {
+		properties=new MessageProperties();
 	}
 	public MessageHandler(Session s) {
 		sessionRef=s;
 	}
-	public MessageHandler(int size) {
-		this.size = size;
+	public MessageHandler(MessageProperties p){
+		this.properties=p;
 	}
-	public MessageHandler(int size, boolean eom) {
-		this.size = size;
-		this.eom = eom;
+	public MessageHandler(int id,MessageProperties p){
+		this.messageID=id;
+		this.properties=p;
 	}
-	public MessageHandler(int size, boolean eom, boolean reSent) {
-		this.size = size;
-		this.eom = eom;
-		this.reSent = reSent;
+	public MessageHandler(Session s,int id,MessageProperties p){
+		this.sessionRef=s;
+		this.messageID=id;
+		this.properties=p;
 	}
-	
 	///////////////////////////////////// Setters and getters
-	public boolean getEom(){
-		return eom;
-	}
-	public void setEom(boolean eom) {
-		this.eom = eom;
-	}
-	public boolean getReSent(){
-		return reSent;
-	}
-	public void setReSent(boolean reSent) {
-		this.reSent = reSent;
-	}
-	public int getSize() {
-		return size;
-	}
-	public void setSize(int size) {
-		this.size = size;
-	}
+	
 	public int getMessageID() {
 		return messageID;
 	}
@@ -58,64 +39,35 @@ public class MessageHandler {
 	public void setSessionRef(Session sessionRef) {
 		this.sessionRef = sessionRef;
 	}
-	
+	public MessageProperties getProperties() {
+		return properties;
+	}
+	public void setProperties(MessageProperties properties) {
+		this.properties = properties;
+	}
 	//////////////////////////// Operations 
 	
+
 	public boolean isEom() {
-		return eom;
+		return properties.isEom();
 	}
 	public boolean isReSent() {
-		return reSent;
+		return properties.isReSent();
 	}
 	
-	public String toString_(){
-		String str="";
-		str=String.valueOf(size);
-		if (eom)
-			str=str+" "+"1";
-		if (reSent)
-			str=str+" "+"1";
-		
-		return str;
-		
-	}
-	
-	public byte[] toBytes_(){
-		return toString_().getBytes();
-	}
-	
-	public static MessageHandler valueOf_(String str){
-		MessageHandler mp=new MessageHandler();
-		int index=str.indexOf(" ");
-		if (index!=-1){
-			mp.setSize(Integer.valueOf(str.substring(0,index)));
-			mp.setEom(true);
-			str=str.substring(index+1);
-			index=str.indexOf(" ");
-			if (index!=-1){
-				mp.setReSent(true);
-			}
-		}
-		else {
-			mp.setSize(Integer.valueOf(str));
-		}
-		
-		return mp;
-	}
-	
-	public MessageHandler valueOf_(byte[] b){
-		return	valueOf_(new String(b));	
+	public int getSize(){
+		return properties.getSize();
 	}
 	
 	//////////////////////////////////////////// Transaction Support
 	
-	public void commit(){
-		sessionRef.commit(messageID);
-	}
-	public void abort(){
-		sessionRef.abort(messageID);
-	}
-	public void confirm(){
+//	public void commit(){
+//		sessionRef.commit(messageID);
+//	}
+//	public void abort(){
+//		sessionRef.abort(messageID);
+//	}
+	public void acknowledge(){
 		sessionRef.confirm(messageID);
 	}
 

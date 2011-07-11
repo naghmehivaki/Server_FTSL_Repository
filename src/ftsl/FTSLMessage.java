@@ -5,10 +5,10 @@ import java.io.Serializable;
 public class FTSLMessage implements Serializable {
 
 	FTSLHeader header;
-	MessageHandler properties;
+	MessageProperties properties;
 	byte[] data;
 
-	public FTSLMessage(FTSLHeader header, MessageHandler p, byte[] d) {
+	public FTSLMessage(FTSLHeader header, MessageProperties p, byte[] d) {
 		this.data = d;
 		this.header = header;
 		this.properties=p;
@@ -17,7 +17,7 @@ public class FTSLMessage implements Serializable {
 	public FTSLMessage(byte[] d, FTSLHeader header) {
 		this.data = d;
 		this.header = header;
-		properties=new MessageHandler();
+		properties=new MessageProperties();
 	}
 	
 	public FTSLMessage() {
@@ -39,11 +39,11 @@ public class FTSLMessage implements Serializable {
 	public FTSLHeader getHeader() {
 		return header;
 	}
-	public MessageHandler getProperties() {
+	public MessageProperties getProperties() {
 		return properties;
 	}
 
-	public void setProperties(MessageHandler properties) {
+	public void setProperties(MessageProperties properties) {
 		this.properties = properties;
 	}
 	////////////////////////////// operations
@@ -78,7 +78,7 @@ public class FTSLMessage implements Serializable {
 		message.setHeader(FTSLHeader.valueOf_(str.substring(0, index-1)));
 		str=str.substring(index+2);
 		index=str.indexOf("\n");
-		message.setProperties(MessageHandler.valueOf_(str.substring(0,index)));
+		message.setProperties(MessageProperties.valueOf_(str.substring(0,index)));
 		message.setData(str.substring(index + 1).getBytes());
 		return message;
 	}
